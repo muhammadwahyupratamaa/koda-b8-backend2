@@ -109,3 +109,11 @@ func (s *UserService) UpdateUser(id int64, req *model.UpdateUser) error{
 	}
 	return s.repo.Update(id,req)
 }
+
+func (s *UserService) DeleteUser(id int64) error{
+	user := s.repo.FindByID(id)
+	if user == nil {
+		return errors.New("User Not Found")
+	}
+	return  s.repo.Delete(id)
+}

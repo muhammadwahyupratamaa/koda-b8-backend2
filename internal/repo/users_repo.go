@@ -175,11 +175,23 @@ func (r *UserRepo) Update(id int64, req *model.UpdateUser) error{
 			name=$1,
 			email=$2,
 			password=$3,
-			updated_at= NOW(),
+			updated_at= NOW()
 		WHERE id=$4`, 
 		req.Name,
 		req.Email,
 		req.Password,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (r *UserRepo) Delete(id int64) error {
+	_, err := r.db.Exec(
+		context.Background(),`
+		DELETE FROM users
+		WHERE id=$1`,
 		id,
 	)
 	if err != nil {
