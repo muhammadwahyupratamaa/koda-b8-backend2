@@ -73,3 +73,39 @@ func (s *UserService) Login(req *model.LoginUser) error{
 func (s *UserService) GetUser() ([]model.User, error) {
 	return s.repo.FindAll()
 }
+
+func (s *UserService) GetUserByID(id int64) (*model.User, error) {
+
+	user := s.repo.FindByID(id)
+
+	if user == nil {
+		return nil, errors.New("User not found")
+	}
+
+	return user, nil
+}
+
+func (s *UserService) UpdateUser(id int64, req *model.UpdateUser) error{
+	user := s.repo.FindByID(id)
+
+	if user == nil {
+		return errors.New("User not found!")
+	}
+	if req.Name == "" {
+		return errors.New("Name is required!")
+	} 
+	if req.Email == "" {
+		return errors.New("Email is required!")
+	}
+	if _,err := mail.ParseAddress(req.Email)
+	err != nil{
+		return errors.New("Email not valid!")
+	}
+	if req.Password == "" {
+		return errors.New("Password is required!")
+	}
+	if len(req.Password) < 8 {
+		return errors.New("Password must be 8 character")
+	}
+	return s.repo.Update(id,req)
+}

@@ -128,3 +128,62 @@ func (r *UserRepo) FindByEmail(email string) *model.User {
 
 	return &user
 }
+
+func (r *UserRepo) FindByID(id int64) *model.User {
+
+	var user model.User
+
+	err := r.db.QueryRow(
+		context.Background(),
+		`
+		SELECT
+			id,
+			name,
+			email,
+			password,
+			created_at,
+			updated_at
+		FROM users
+		WHERE id = $1
+		`,
+		id,
+	).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil
+		}
+
+		return nil
+	}
+
+	return &user
+}
+
+func (r *UserRepo) Update(id int64, req *model.UpdateUser) error{
+	_, err := r.db.Exec(
+		context.Background(),`
+		UPDATE users 
+		SET
+			name=$1,
+			email=$2,
+			password=$3,
+			updated_at= NOW(),
+		WHERE id=$4`, 
+		req.Name,
+		req.Email,
+		req.Password,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
