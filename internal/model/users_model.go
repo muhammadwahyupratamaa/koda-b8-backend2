@@ -23,3 +23,9 @@ type LoginUser struct {
 	Password string `form:"password"`
 }
 
+type UpdateUser struct {
+	Name string `json:"name"`
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
