@@ -4,6 +4,7 @@ import (
 	"koda-b8-backend1/internal/model"
 	"koda-b8-backend1/internal/svc"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -84,5 +85,76 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 c.JSON(http.StatusOK, users)
 }
 
+func (h *UserHandler) GetUserByID(c *gin.Context) {
 
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid user id",
+		})
+		return
+	}
+
+	user, err := h.service.GetUserByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"),10,64)
+	if err != nil { 
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+
+	var req model.UpdateUser
+
+	if err := c.ShouldBind(&req)
+	err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	err = h.service.UpdateUser(id,&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		}) 
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message" :"user updated successfully",
+	})
+}
+
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"),10,64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+	err = h.service.DeleteUser(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message" : "User deleted successfully",
+	})
+
+}
 
