@@ -51,7 +51,7 @@ function Register() {
       });
 
       alert(response.data.message);
-      localStorage.setItem("token", "hello");
+      localStorage.setItem("token", response.data.token);
       window.location.href = "/login";
     } catch (error) {
       console.log("Status:", error.response?.status);

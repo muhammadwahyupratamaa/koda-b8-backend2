@@ -18,7 +18,7 @@ function Users() {
     try {
       const response = await api.get("/users", {
         headers: {
-          Authorization: token,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -41,13 +41,13 @@ function Users() {
       if (isEdit) {
         await api.put(`/users/${selectedId}`, data, {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         });
       } else {
         await api.post("/users", data, {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         });
       }
@@ -77,23 +77,23 @@ function Users() {
       const token = localStorage.getItem("token");
       await api.delete(`users/${id}`, {
         headers: {
-          Authorization: token,
+          Authorization: `Bearer ${token}`,
         },
       });
       getUsers();
     } catch (error) {
-      console.log(err);
+      console.log(error.response?.data || error.message);
     }
   };
 
   const handleEdit = (user) => {
-    setIsEdit(true)
-    setShowForm(true)
-    setSelectedId(user.id)
-    setName(user.name)
-    setEmail(user.email)
-    setPassword("")
-  }
+    setIsEdit(true);
+    setShowForm(true);
+    setSelectedId(user.id);
+    setName(user.name);
+    setEmail(user.email);
+    setPassword("");
+  };
 
   return (
     <div className="min-h-screen px-8 py-10">
@@ -171,7 +171,7 @@ function Users() {
           )}
           {users.map((user) => (
             <div
-              key={user.ID}
+              key={user.id}
               className="flex items-center justify-between border-b border-gray-300 pb-5"
             >
               <div>
@@ -181,7 +181,10 @@ function Users() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => handleEdit(user)} className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
+                <button
+                  onClick={() => handleEdit(user)}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                >
                   <FaEdit />
                   Edit
                 </button>

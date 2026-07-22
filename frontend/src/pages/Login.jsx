@@ -33,7 +33,7 @@ function Login() {
       });
 
       alert(response.data.message);
-      localStorage.setItem("token", "hello");
+      localStorage.setItem("token", response.data.token);
       window.location.href = "/users";
     } catch (error) {
       console.log("Status:", error.response?.status);
