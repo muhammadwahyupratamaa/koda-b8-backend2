@@ -4,18 +4,18 @@ import "time"
 
 
 type User struct {
-	ID int64
-	Name string
-	Email string
-	Password string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID int64 `form:"ID" json:"id"`
+	Name string `form:"name" json:name"` 
+	Email string `form:"email" json:"email"`
+	Password string `form:"password" json:"-"`
+	CreatedAt time.Time `form:"createdAt" json:"createdAt"` 
+	UpdatedAt time.Time `form:"updatedAt" json:"updatedAt"`
 }
 
 type CreateUser struct{
 	Name string `form:"name" json:"name"`
 	Email string `form:"email" json:"email"`
-	Password string `form:"password" json:"password"`
+	Password string `form:"password" json:"-"`
 }
 
 type LoginUser struct {
@@ -26,6 +26,6 @@ type LoginUser struct {
 type UpdateUser struct {
 	Name string `form:"name" json:"name"`
 	Email string `form:"email" json:"email"`
-	Password string `form:"password" json:"password"`
+	Password string `form:"password" json:"-"`
 }
 

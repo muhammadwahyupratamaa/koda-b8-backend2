@@ -20,11 +20,13 @@ func main() {
 	container := di.NewContainer(db)
 
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.AuthMiddleware())
 
 
 	r.POST("/register", container.UserHandler().Register)
 	r.POST("/login", container.UserHandler().Login)
+	r.POST("/users", container.UserHandler().CreateUser)
 	r.GET("/users", container.UserHandler().GetUser)
 	r.GET("/users/:id", container.UserHandler().GetUserByID)
 	r.PUT("/users/:id", container.UserHandler().UpdateUser)

@@ -158,3 +158,29 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 }
 
+func (h *UserHandler) CreateUser(c *gin.Context) {
+
+	var req model.CreateUser
+
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.service.CreateUser(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "User created successfully",
+	})
+}
+
