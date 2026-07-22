@@ -119,7 +119,7 @@ function Register() {
 
           <button
             type="submit"
-            className="w-full bg-gray-900 hover:bg-black text-white py-4 rounded-full text-lg font-semibold transition duration-300 shadow-lg"
+            className="w-full cursor-pointer bg-gray-900 hover:bg-black text-white py-4 rounded-full text-lg font-semibold transition duration-300 shadow-lg"
           >
             Create Account
           </button>

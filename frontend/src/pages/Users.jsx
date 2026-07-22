@@ -171,13 +171,13 @@ function Users() {
           )}
           {users.map((user) => (
             <div
-              key={user.id}
+              key={user.ID}
               className="flex items-center justify-between border-b border-gray-300 pb-5"
             >
               <div>
-                <h2 className="font-semibold text-xl">{user.Name}</h2>
+                <h2 className="font-semibold text-xl">{user.name}</h2>
 
-                <p className="text-gray-500">{user.Email}</p>
+                <p className="text-gray-500">{user.email}</p>
               </div>
 
               <div className="flex gap-3">

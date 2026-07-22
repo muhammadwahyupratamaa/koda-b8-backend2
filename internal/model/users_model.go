@@ -5,7 +5,7 @@ import "time"
 
 type User struct {
 	ID int64 `form:"ID" json:"id"`
-	Name string `form:"name" json:name"` 
+	Name string `form:"name" json:"name"` 
 	Email string `form:"email" json:"email"`
 	Password string `form:"password" json:"-"`
 	CreatedAt time.Time `form:"createdAt" json:"createdAt"` 

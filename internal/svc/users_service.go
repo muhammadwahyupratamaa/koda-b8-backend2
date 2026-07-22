@@ -50,24 +50,24 @@ func (s *UserService) Register(req *model.CreateUser) error{
 return nil
 }
 
-func (s *UserService) Login(req *model.LoginUser) error{
+func (s *UserService) Login(req *model.LoginUser) (*model.User, error){
 	user := s.repo.FindByEmail(req.Email)
 
 	if strings.TrimSpace(req.Email) == "" {
-    return errors.New("Email address is required")
+    return nil, errors.New("Email address is required")
 	}
 
 	if strings.TrimSpace(req.Password) == "" {
-    return errors.New("Password is required")
+    return nil, errors.New("Password is required")
 	}
 
 	if user == nil {
-		return errors.New("User not found")
+		return nil, errors.New("User not found")
 	}
 	if user.Password != req.Password {
-		return  errors.New("Invalid password")
+		return nil,  errors.New("Invalid password")
 	}
-	return  nil
+	return user, nil
 }
 
 func (s *UserService) GetUser() ([]model.User, error) {
