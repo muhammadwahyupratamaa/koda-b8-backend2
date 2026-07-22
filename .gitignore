@@ -1,0 +1,9 @@
+# Air
+tmp/
+
+# Environment
+.env
+
+# Uploads
+uploads/*
+!uploads/.gitkeep

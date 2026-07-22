@@ -28,6 +28,7 @@ func main() {
 	r.POST("/login", container.UserHandler().Login)
 	r.POST("/users", container.UserHandler().CreateUser)
 	r.GET("/users", container.UserHandler().GetUser)
+	r.POST("/upload", container.UserHandler().UploadFile)
 	r.GET("/users/:id", container.UserHandler().GetUserByID)
 	r.PUT("/users/:id", container.UserHandler().UpdateUser)
 	r.DELETE("/users/:id", container.UserHandler().DeleteUser)

@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"koda-b8-backend1/internal/lib"
 	"koda-b8-backend1/internal/model"
 	"koda-b8-backend1/internal/svc"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -84,8 +86,6 @@ func (h *UserHandler) Login(c *gin.Context) {
 	})
 }
 
-
-
 func (h *UserHandler) GetUser(c *gin.Context) {
 
 	users, err := h.service.GetUser()
@@ -144,6 +144,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		}) 
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message" :"user updated successfully",
@@ -195,6 +196,31 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"success": true,
 		"message": "User created successfully",
+	})
+}
+
+func (h *UserHandler) UploadFile(c *gin.Context) {
+	file, err := c.FormFile("file")
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+        "message": "file is required",
+    })
+    return
+	}
+	fileName := fmt.Sprintf("%d-%s", time.Now().Unix(), file.Filename)
+
+	err = c.SaveUploadedFile(file, "./uploads/"+fileName)
+	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+    "message": "Upload Success",
+    "file": fileName,
 	})
 }
 
