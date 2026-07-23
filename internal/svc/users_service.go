@@ -6,6 +6,8 @@ import (
 	"koda-b8-backend1/internal/repo"
 	"net/mail"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -40,7 +42,17 @@ func (s *UserService) Register(req *model.CreateUser) error {
 	if user != nil {
 		return errors.New("Email already exist1")
 	}
-	err := s.repo.Create(req)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword(
+	[]byte(req.Password),
+	bcrypt.DefaultCost,
+	)	
+	if err != nil {
+	return err
+	}
+
+	req.Password = string(hashedPassword)
+	err = s.repo.Create(req)
 	if err != nil {
 		return err
 	}
@@ -62,8 +74,13 @@ func (s *UserService) Login(req *model.LoginUser) (*model.User, error) {
 	if user == nil {
 		return nil, errors.New("User not found")
 	}
-	if user.Password != req.Password {
-		return nil, errors.New("Invalid password")
+	err := bcrypt.CompareHashAndPassword(
+	[]byte(user.Password),
+	[]byte(req.Password),
+	)
+
+	if err != nil {
+	return nil, errors.New("Invalid password")
 	}
 	return user, nil
 }
