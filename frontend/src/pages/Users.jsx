@@ -24,7 +24,7 @@ function Users() {
         },
       });
 
-      setUsers(response.data);
+      setUsers(response.data.result);
     } catch (error) {
       console.log(error.response?.data || error.message);
     }
