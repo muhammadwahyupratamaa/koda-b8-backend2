@@ -6,5 +6,5 @@ CREATE TABLE "users" (
     "created_at" TIMESTAMP DEFAULT NOW(),
     "updated_at" TIMESTAMP DEFAULT NOW()
 );
-
-SELECT * FROM users;
+SELECT id, name, email, picture
+FROM users;
