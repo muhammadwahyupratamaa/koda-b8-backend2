@@ -8,27 +8,25 @@ import (
 	"strings"
 )
 
-
 type UserService struct {
 	repo *repo.UserRepo
 }
 
-func NewUserService(r *repo.UserRepo) *UserService{
+func NewUserService(r *repo.UserRepo) *UserService {
 	return &UserService{
 		repo: r,
 	}
 }
 
-func (s *UserService) Register(req *model.CreateUser) error{
-	
+func (s *UserService) Register(req *model.CreateUser) error {
+
 	if req.Name == "" {
 		return errors.New("Name is required!")
 	}
 	if req.Email == "" {
 		return errors.New("Email is required!")
 	}
-	if _,err := mail.ParseAddress(req.Email)
-	err != nil{
+	if _, err := mail.ParseAddress(req.Email); err != nil {
 		return errors.New("Email not valid!")
 	}
 	if req.Password == "" {
@@ -40,38 +38,38 @@ func (s *UserService) Register(req *model.CreateUser) error{
 	user := s.repo.FindByEmail(req.Email)
 
 	if user != nil {
-		return  errors.New("Email already exist1")
+		return errors.New("Email already exist1")
 	}
 	err := s.repo.Create(req)
 	if err != nil {
-	return err
+		return err
+	}
+
+	return nil
 }
 
-return nil
-}
-
-func (s *UserService) Login(req *model.LoginUser) (*model.User, error){
+func (s *UserService) Login(req *model.LoginUser) (*model.User, error) {
 	user := s.repo.FindByEmail(req.Email)
 
 	if strings.TrimSpace(req.Email) == "" {
-    return nil, errors.New("Email address is required")
+		return nil, errors.New("Email address is required")
 	}
 
 	if strings.TrimSpace(req.Password) == "" {
-    return nil, errors.New("Password is required")
+		return nil, errors.New("Password is required")
 	}
 
 	if user == nil {
 		return nil, errors.New("User not found")
 	}
 	if user.Password != req.Password {
-		return nil,  errors.New("Invalid password")
+		return nil, errors.New("Invalid password")
 	}
 	return user, nil
 }
 
-func (s *UserService) GetUser() ([]model.User, error) {
-	return s.repo.FindAll()
+func (s *UserService) GetUser(name, email string) ([]model.User, error) {
+	return s.repo.FindAll(name, email)
 }
 
 func (s *UserService) GetUserByID(id int64) (*model.User, error) {
@@ -85,7 +83,7 @@ func (s *UserService) GetUserByID(id int64) (*model.User, error) {
 	return user, nil
 }
 
-func (s *UserService) UpdateUser(id int64, req *model.UpdateUser) error{
+func (s *UserService) UpdateUser(id int64, req *model.UpdateUser) error {
 	user := s.repo.FindByID(id)
 
 	if user == nil {
@@ -93,12 +91,11 @@ func (s *UserService) UpdateUser(id int64, req *model.UpdateUser) error{
 	}
 	if req.Name == "" {
 		return errors.New("Name is required!")
-	} 
+	}
 	if req.Email == "" {
 		return errors.New("Email is required!")
 	}
-	if _,err := mail.ParseAddress(req.Email)
-	err != nil{
+	if _, err := mail.ParseAddress(req.Email); err != nil {
 		return errors.New("Email not valid!")
 	}
 	if req.Password == "" {
@@ -107,15 +104,15 @@ func (s *UserService) UpdateUser(id int64, req *model.UpdateUser) error{
 	if len(req.Password) < 8 {
 		return errors.New("Password must be 8 character")
 	}
-	return s.repo.Update(id,req)
+	return s.repo.Update(id, req)
 }
 
-func (s *UserService) DeleteUser(id int64) error{
+func (s *UserService) DeleteUser(id int64) error {
 	user := s.repo.FindByID(id)
 	if user == nil {
 		return errors.New("User Not Found")
 	}
-	return  s.repo.Delete(id)
+	return s.repo.Delete(id)
 }
 func (s *UserService) CreateUser(req *model.CreateUser) error {
 

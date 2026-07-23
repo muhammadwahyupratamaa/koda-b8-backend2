@@ -14,24 +14,25 @@ type UserRepo struct {
 
 func NewUserRepo(db *pgxpool.Pool) *UserRepo {
 	return &UserRepo{
-		db:db,
+		db: db,
 	}
 }
 
-func (r *UserRepo) Create(req *model.CreateUser) error{
+func (r *UserRepo) Create(req *model.CreateUser) error {
 
 	_, err := r.db.Exec(
-		context.Background(),`
-		INSERT INTO users (name,email,password)
-		VALUES ($1,$2,$3) `,
+		context.Background(), `
+		INSERT INTO users (name,email,password,picture)
+		VALUES ($1,$2,$3,$4) `,
 		req.Name,
 		req.Email,
 		req.Password,
+		req.Picture,
 	)
 	if err != nil {
 		return err
 	}
-		return nil
+	return nil
 
 	// id := len(*r.data) + 1
 
@@ -42,21 +43,36 @@ func (r *UserRepo) Create(req *model.CreateUser) error{
 	// })
 }
 
-func (r *UserRepo) FindAll() ([]model.User, error) {
+func (r *UserRepo) FindAll(name, email string) ([]model.User, error) {
 
-	rows, err := r.db.Query(
-		context.Background(),
-		`
+	query := `
 		SELECT
 			id,
 			name,
 			email,
 			password,
+			COALESCE(picture, '') AS picture,
 			created_at,
 			updated_at
 		FROM users
-		ORDER BY id ASC
-		`,
+	`
+
+	var args []any
+
+	if name != "" {
+		query += " WHERE name ILIKE $1"
+		args = append(args, "%"+name+"%")
+	} else if email != "" {
+		query += " WHERE email ILIKE $1"
+		args = append(args, "%"+email+"%")
+	}
+
+	query += " ORDER BY id ASC"
+
+	rows, err := r.db.Query(
+		context.Background(),
+		query,
+		args...,
 	)
 	if err != nil {
 		return nil, err
@@ -66,7 +82,6 @@ func (r *UserRepo) FindAll() ([]model.User, error) {
 	var users []model.User
 
 	for rows.Next() {
-
 		var user model.User
 
 		err := rows.Scan(
@@ -74,6 +89,7 @@ func (r *UserRepo) FindAll() ([]model.User, error) {
 			&user.Name,
 			&user.Email,
 			&user.Password,
+			&user.Picture,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
@@ -103,6 +119,7 @@ func (r *UserRepo) FindByEmail(email string) *model.User {
 			name,
 			email,
 			password,
+			COALESCE(picture, '') AS picture,
 			created_at,
 			updated_at
 		FROM users
@@ -114,6 +131,7 @@ func (r *UserRepo) FindByEmail(email string) *model.User {
 		&user.Name,
 		&user.Email,
 		&user.Password,
+		&user.Picture,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -141,6 +159,7 @@ func (r *UserRepo) FindByID(id int64) *model.User {
 			name,
 			email,
 			password,
+			COALESCE(picture, '') AS picture,
 			created_at,
 			updated_at
 		FROM users
@@ -152,6 +171,7 @@ func (r *UserRepo) FindByID(id int64) *model.User {
 		&user.Name,
 		&user.Email,
 		&user.Password,
+		&user.Picture,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -167,19 +187,21 @@ func (r *UserRepo) FindByID(id int64) *model.User {
 	return &user
 }
 
-func (r *UserRepo) Update(id int64, req *model.UpdateUser) error{
+func (r *UserRepo) Update(id int64, req *model.UpdateUser) error {
 	_, err := r.db.Exec(
-		context.Background(),`
+		context.Background(), `
 		UPDATE users 
 		SET
 			name=$1,
 			email=$2,
 			password=$3,
+			picture=$4,
 			updated_at= NOW()
-		WHERE id=$4`, 
+		WHERE id=$5`,
 		req.Name,
 		req.Email,
 		req.Password,
+		req.Picture,
 		id,
 	)
 	if err != nil {
@@ -189,7 +211,7 @@ func (r *UserRepo) Update(id int64, req *model.UpdateUser) error{
 }
 func (r *UserRepo) Delete(id int64) error {
 	_, err := r.db.Exec(
-		context.Background(),`
+		context.Background(), `
 		DELETE FROM users
 		WHERE id=$1`,
 		id,

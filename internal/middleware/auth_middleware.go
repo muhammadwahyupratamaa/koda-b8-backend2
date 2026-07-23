@@ -12,7 +12,11 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		if c.Request.URL.Path == "/login" || c.Request.URL.Path == "/register" {
+		path := c.Request.URL.Path
+
+		if path == "/login" ||
+			path == "/register" ||
+			strings.HasPrefix(path, "/uploads") {
 			c.Next()
 			return
 		}
