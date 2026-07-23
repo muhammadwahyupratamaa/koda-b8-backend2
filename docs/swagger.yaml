@@ -141,6 +141,18 @@ paths:
         in: query
         name: search[email]
         type: string
+      - description: Sort by ID (asc/desc)
+        in: query
+        name: sort[id]
+        type: string
+      - description: Sort by Name (asc/desc)
+        in: query
+        name: sort[name]
+        type: string
+      - description: Sort by Email (asc/desc)
+        in: query
+        name: sort[email]
+        type: string
       produces:
       - application/json
       responses:

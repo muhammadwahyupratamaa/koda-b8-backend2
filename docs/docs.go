@@ -212,6 +212,24 @@ const docTemplate = `{
                         "description": "Search by email",
                         "name": "search[email]",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by ID (asc/desc)",
+                        "name": "sort[id]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by Name (asc/desc)",
+                        "name": "sort[name]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by Email (asc/desc)",
+                        "name": "sort[email]",
+                        "in": "query"
                     }
                 ],
                 "responses": {
