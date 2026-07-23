@@ -1,0 +1,49 @@
+### Register
+POST http://localhost:8080/register
+Content-Type: application/x-www-form-urlencoded
+
+name=sabtu&email=sabtu@mail.com&password=12345678
+
+###
+
+### Login
+POST http://localhost:8080/login
+Content-Type: application/x-www-form-urlencoded
+
+email=sabtu@mail.com&password=12345678
+
+###
+
+### Get Users
+GET http://localhost:8080/users
+Authorization: Bearer <JWT_TOKEN>
+
+###
+
+### Get User By ID
+GET http://localhost:8080/users/12
+Authorization: Bearer <JWT_TOKEN>
+
+###
+
+### Create User
+POST http://localhost:8080/users
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer <JWT_TOKEN>
+
+name=raply&email=raply@mail.com&password=12345678
+
+###
+
+### Update User
+PUT http://localhost:8080/users/9
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer <JWT_TOKEN>
+
+name=raply&email=raply@mail.com&password=12345678
+
+###
+
+### Delete User
+DELETE http://localhost:8080/users/9
+Authorization: Bearer <JWT_TOKEN>
