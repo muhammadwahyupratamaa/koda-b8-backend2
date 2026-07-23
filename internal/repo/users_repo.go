@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"koda-b8-backend1/internal/model"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -43,7 +44,7 @@ func (r *UserRepo) Create(req *model.CreateUser) error {
 	// })
 }
 
-func (r *UserRepo) FindAll(name, email string) ([]model.User, error) {
+func (r *UserRepo) FindAll(page, limit int, name, email string) ([]model.User, error) {
 
 	query := `
 		SELECT
@@ -56,6 +57,7 @@ func (r *UserRepo) FindAll(name, email string) ([]model.User, error) {
 			updated_at
 		FROM users
 	`
+	offset := (page - 1) * limit
 
 	var args []any
 
@@ -68,6 +70,12 @@ func (r *UserRepo) FindAll(name, email string) ([]model.User, error) {
 	}
 
 	query += " ORDER BY id ASC"
+
+	query += " LIMIT $" + strconv.Itoa(len(args)+1)
+	args = append(args, limit)
+
+	query += " OFFSET $" + strconv.Itoa(len(args)+1)
+	args = append(args, offset)
 
 	rows, err := r.db.Query(
 		context.Background(),

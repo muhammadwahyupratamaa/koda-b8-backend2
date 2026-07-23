@@ -178,7 +178,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retreieve all User",
+                "description": "Retrieve all User",
                 "produces": [
                     "application/json"
                 ],
@@ -187,6 +187,20 @@ const docTemplate = `{
                 ],
                 "summary": "Get all User",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page Number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 5,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Search by name",

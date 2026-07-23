@@ -23,17 +23,18 @@ func NewUserHandler(service *svc.UserService) *UserHandler {
 }
 
 // Register godoc
-// @Summary 			Register a new User
-// @Description 		Create a new user account
-// @Tags 			Auth
-// @Accept 			x-www-form-urlencoded
-// @Produce 			json
-// @Param			name formData string true "User name"
-// @Param			email formData string true "User Email" format(email)
-// @Param			password formData string true "User Password" format(password)
-// @Success			201	{object} lib.Response
-// @Failure 			400	{object} lib.Response
-// @Router			/register [post]
+//
+//	@Summary		Register a new User
+//	@Description	Create a new user account
+//	@Tags			Auth
+//	@Accept			x-www-form-urlencoded
+//	@Produce		json
+//	@Param			name		formData	string	true	"User name"
+//	@Param			email		formData	string	true	"User Email"	format(email)
+//	@Param			password	formData	string	true	"User Password"	format(password)
+//	@Success		201			{object}	lib.Response
+//	@Failure		400			{object}	lib.Response
+//	@Router			/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	var req model.CreateUser
 
@@ -58,17 +59,18 @@ func (h *UserHandler) Register(c *gin.Context) {
 }
 
 // Login godoc
-// @Summary			Login
-// @Description 		Login using email and password
-// @Tags				Auth
-// @Accept			application/x-www-form-urlencoded
-// @Produce			json
-// @Param			email formData string true "User Email" format(email)
-// @Param			password formData string true "User Password" format(password)
-// @Success			200 {object} lib.Response
-// @Failure			400 {object} lib.Response
-// @Failure			500 {object} lib.Response
-// @Router			/login [post]
+//
+//	@Summary		Login
+//	@Description	Login using email and password
+//	@Tags			Auth
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			email		formData	string	true	"User Email"	format(email)
+//	@Param			password	formData	string	true	"User Password"	format(password)
+//	@Success		200			{object}	lib.Response
+//	@Failure		400			{object}	lib.Response
+//	@Failure		500			{object}	lib.Response
+//	@Router			/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 
 	var form model.LoginUser
@@ -109,22 +111,37 @@ func (h *UserHandler) Login(c *gin.Context) {
 }
 
 // GetUser godoc
-// @Summary 			Get all User
-// @Description		Retreieve all User
-// @Tags 			users
-// @Produce			json
-// @Security 		BearerAuth
-// @Param			search[name] query string false "Search by name"
-// @Param			search[email] query string false "Search by email"
-// @Success			200 {object} lib.Response
-// @Failure			500 {object} lib.Response
-// @Router			/users [get]
+//
+//	@Summary		Get all User
+//	@Description	Retrieve all User
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			page			query		int		false	"Page Number"		default(1)
+//	@Param			limit			query		int		false	"Items per page"	default(5)
+//	@Param			search[name]	query		string	false	"Search by name"
+//	@Param			search[email]	query		string	false	"Search by email"
+//	@Success		200				{object}	lib.Response
+//	@Failure		500				{object}	lib.Response
+//	@Router			/users [get]
 func (h *UserHandler) GetUser(c *gin.Context) {
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "5")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 5
+	}
 
 	searchName := c.Query("search[name]")
 	searchEmail := c.Query("search[email]")
 
-	users, err := h.service.GetUser(searchName, searchEmail)
+	users, err := h.service.GetUser(page, limit, searchName, searchEmail)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, lib.Response{
 			Success: false,
@@ -141,16 +158,17 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 }
 
 // GetUserByID godoc
-// @Summary 			Get User by Id
-// @Description		Retrieve user Id
-// @Tags 			users
-// @Produce			json
-// @Security 		BearerAuth
-// @Success			200 {object} lib.Response
-// @Failure			400 {object} lib.Response
-// @Failure			404 {object} lib.Response
-// @Param			id path int true "User ID"
-// @Router			/users/{id} [get]
+//
+//	@Summary		Get User by Id
+//	@Description	Retrieve user Id
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	lib.Response
+//	@Failure		400	{object}	lib.Response
+//	@Failure		404	{object}	lib.Response
+//	@Param			id	path		int	true	"User ID"
+//	@Router			/users/{id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -179,21 +197,22 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 }
 
 // UpdateUser godoc
-// @Summary			Update user
-// @Description  	Update User
-// @Tags				users
-// @Accept 			multipart/form-data
-// @Produce			json
-// @Security			BearerAuth
-// @Param			id path int true "User ID"
-// @Param			name formData string false "User nama"
-// @Param			email formData string false "User email" format(email)
-// @Param			password formData string false "User password" format(password)
-// @Param			picture formData string false "profile picture"
-// @Success			200 {object} lib.Response
-// @Failure			400 {object} lib.Response
-// @Failure			500 {object} lib.Response
-// @Router			/users/{id} [put]
+//
+//	@Summary		Update user
+//	@Description	Update User
+//	@Tags			users
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id			path		int		true	"User ID"
+//	@Param			name		formData	string	false	"User nama"
+//	@Param			email		formData	string	false	"User email"	format(email)
+//	@Param			password	formData	string	false	"User password"	format(password)
+//	@Param			picture		formData	string	false	"profile picture"
+//	@Success		200			{object}	lib.Response
+//	@Failure		400			{object}	lib.Response
+//	@Failure		500			{object}	lib.Response
+//	@Router			/users/{id} [put]
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -247,15 +266,16 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 }
 
 // DeleteUser godoc
-// @Summary 			Delete User
-// @Description 		Delete user by ID
-// @Tags 			users
-// @Produce 			json
-// @Security			BearerAuth
-// @Param			id path int true "user id"
-// @Success			200 {object} lib.Response
-// @Failure			400 {object} lib.Response
-// @Router			/users/{id} [delete]
+//
+//	@Summary		Delete User
+//	@Description	Delete user by ID
+//	@Tags			users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		int	true	"user id"
+//	@Success		200	{object}	lib.Response
+//	@Failure		400	{object}	lib.Response
+//	@Router			/users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -282,20 +302,21 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 }
 
 // CreateUser godoc
-// @Summary 			Create New User
-// @Description 		Create New User with profile picture
-// @Tags 			users
-// @Accept 			multipart/form-data
-// @Produce			json
-// @Security 		BearerAuth
-// @Param			name formData string true "User Name"
-// @Param			email formData string true "User email" format(email)
-// @Param			password formData string true "User password" format(password)
-// @Param 			picture formData file false "Profile Picture"
-// @Success			201 {object} lib.Response
-// @Failure			400 {object} lib.Response
-// @Failure			500 {object} lib.Response
-// @Router			/users [post]
+//
+//	@Summary		Create New User
+//	@Description	Create New User with profile picture
+//	@Tags			users
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			name		formData	string	true	"User Name"
+//	@Param			email		formData	string	true	"User email"	format(email)
+//	@Param			password	formData	string	true	"User password"	format(password)
+//	@Param			picture		formData	file	false	"Profile Picture"
+//	@Success		201			{object}	lib.Response
+//	@Failure		400			{object}	lib.Response
+//	@Failure		500			{object}	lib.Response
+//	@Router			/users [post]
 func (h *UserHandler) CreateUser(c *gin.Context) {
 
 	var req model.CreateUser
@@ -348,17 +369,18 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 }
 
 // UploadFile godoc
-// @Summary 			Upload File
-// @Description 		Upload file Image
-// @Tags				Upload
-// @Accept			multipart/form-data
-// @Produce 			json
-// @Security			BearerAuth
-// @Param 			file formData file true "Image File"
-// @Success			200 {object} lib.Response
-// @Failure			400 {object} lib.Response
-// @Failure			500 {object} lib.Response
-// @Router 			/upload [post]
+//
+//	@Summary		Upload File
+//	@Description	Upload file Image
+//	@Tags			Upload
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			file	formData	file	true	"Image File"
+//	@Success		200		{object}	lib.Response
+//	@Failure		400		{object}	lib.Response
+//	@Failure		500		{object}	lib.Response
+//	@Router			/upload [post]
 func (h *UserHandler) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
 	fmt.Println("File Size:", file.Size)

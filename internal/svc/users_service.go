@@ -68,8 +68,8 @@ func (s *UserService) Login(req *model.LoginUser) (*model.User, error) {
 	return user, nil
 }
 
-func (s *UserService) GetUser(name, email string) ([]model.User, error) {
-	return s.repo.FindAll(name, email)
+func (s *UserService) GetUser(page, limit int, name, email string) ([]model.User, error) {
+	return s.repo.FindAll(page, limit, name, email)
 }
 
 func (s *UserService) GetUserByID(id int64) (*model.User, error) {
