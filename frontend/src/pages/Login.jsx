@@ -31,9 +31,9 @@ function Login() {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-
+      console.log(response.data);
       alert(response.data.message);
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.data.result.token);
       window.location.href = "/users";
     } catch (error) {
       console.log("Status:", error.response?.status);
