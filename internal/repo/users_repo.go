@@ -44,7 +44,15 @@ func (r *UserRepo) Create(req *model.CreateUser) error {
 	// })
 }
 
-func (r *UserRepo) FindAll(page, limit int, name, email string) ([]model.User, error) {
+func (r *UserRepo) FindAll(
+	page,
+	limit int,
+	name,
+	email,
+	sortID,
+	sortName,
+	sortEmail string,
+) ([]model.User, error) {
 
 	query := `
 		SELECT
@@ -69,7 +77,26 @@ func (r *UserRepo) FindAll(page, limit int, name, email string) ([]model.User, e
 		args = append(args, "%"+email+"%")
 	}
 
-	query += " ORDER BY id ASC"
+	orderBy := "id ASC"
+
+	switch {
+	case sortID == "asc":
+		orderBy = "id ASC"
+	case sortID == "desc":
+		orderBy = "id DESC"
+
+	case sortName == "asc":
+		orderBy = "name ASC"
+	case sortName == "desc":
+		orderBy = "name DESC"
+
+	case sortEmail == "asc":
+		orderBy = "email ASC"
+	case sortEmail == "desc":
+		orderBy = "email DESC"
+	}
+
+	query += " ORDER BY " + orderBy
 
 	query += " LIMIT $" + strconv.Itoa(len(args)+1)
 	args = append(args, limit)
