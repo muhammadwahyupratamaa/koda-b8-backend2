@@ -5,14 +5,16 @@ import api from "../services/api";
 function Users() {
   const [users, setUsers] = useState([]);
   const token = localStorage.getItem("token");
+
   const [showForm, setShowForm] = useState(false);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [picture, setPicture] = useState(null);
+
   const [isEdit, setIsEdit] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-
-  console.log("TOKEN:", token);
 
   const getUsers = async () => {
     try {
@@ -22,21 +24,27 @@ function Users() {
         },
       });
 
-      console.log(response.data);
-
       setUsers(response.data);
     } catch (error) {
-      console.error(error.response?.data || error.message);
+      console.log(error.response?.data || error.message);
     }
   };
 
+  useEffect(() => {
+    getUsers();
+  }, []);
+
   const saveUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const data = new URLSearchParams();
+      const data = new FormData();
+
       data.append("name", name);
       data.append("email", email);
       data.append("password", password);
+
+      if (picture) {
+        data.append("picture", picture);
+      }
 
       if (isEdit) {
         await api.put(`/users/${selectedId}`, data, {
@@ -55,6 +63,8 @@ function Users() {
       setName("");
       setEmail("");
       setPassword("");
+      setPicture(null);
+
       setShowForm(false);
       setIsEdit(false);
       setSelectedId(null);
@@ -65,21 +75,18 @@ function Users() {
     }
   };
 
-  useEffect(() => {
-    getUsers();
-  }, []);
-
   const deleteUser = async (id) => {
     const confirmDelete = window.confirm("Delete this user?");
 
     if (!confirmDelete) return;
+
     try {
-      const token = localStorage.getItem("token");
-      await api.delete(`users/${id}`, {
+      await api.delete(`/users/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       getUsers();
     } catch (error) {
       console.log(error.response?.data || error.message);
@@ -89,10 +96,13 @@ function Users() {
   const handleEdit = (user) => {
     setIsEdit(true);
     setShowForm(true);
+
     setSelectedId(user.id);
+
     setName(user.name);
     setEmail(user.email);
     setPassword("");
+    setPicture(null);
   };
 
   return (
@@ -106,58 +116,81 @@ function Users() {
           </div>
 
           <button
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              setShowForm(!showForm);
+
+              if (showForm) {
+                setName("");
+                setEmail("");
+                setPassword("");
+                setPicture(null);
+                setIsEdit(false);
+                setSelectedId(null);
+              }
+            }}
             className="flex items-center gap-2 bg-gray-900 text-white px-5 py-3 rounded-lg hover:bg-black transition"
           >
             <FaPlus />
             Add User
           </button>
         </div>
+
         {showForm && (
           <div className="mx-30 my-10">
             <div className="flex flex-col gap-4">
               <input
                 type="text"
-                name="name"
                 value={name}
-                id="name"
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Masukan Nama anda..."
+                placeholder="Masukan Nama..."
                 className="w-full border rounded-xl p-3"
               />
 
               <input
                 type="email"
-                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                id="email"
-                placeholder="Masukan Email anda..."
+                placeholder="Masukan Email..."
                 className="w-full border rounded-xl p-3"
               />
 
               <input
                 type="password"
-                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                id="password"
-                placeholder="Masukan Password anda..."
+                placeholder="Masukan Password..."
+                className="w-full border rounded-xl p-3"
+              />
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setPicture(e.target.files[0])}
                 className="w-full border rounded-xl p-3"
               />
             </div>
 
-            <div className=" flex gap-5 text-md mt-5 justify-around">
+            <div className="flex gap-5 mt-5 justify-around">
               <button
-                className="border-b border-orange-500"
                 onClick={saveUsers}
+                className="border-b border-orange-500"
               >
-                {isEdit ? "Update user" : "Save User"}
+                {isEdit ? "Update User" : "Save User"}
               </button>
 
               <button
                 className="border-b border-orange-500"
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+
+                  setName("");
+                  setEmail("");
+                  setPassword("");
+                  setPicture(null);
+
+                  setIsEdit(false);
+                  setSelectedId(null);
+                }}
               >
                 Cancel
               </button>
@@ -165,40 +198,67 @@ function Users() {
           </div>
         )}
 
-        <div className="space-y-5">
-          {users.length === 0 && (
-            <p className="text-center text-gray-500">No user data.</p>
-          )}
-          {users.map((user) => (
-            <div
-              key={user.id}
-              className="flex items-center justify-between border-b border-gray-300 pb-5"
-            >
-              <div>
-                <h2 className="font-semibold text-xl">{user.name}</h2>
+        <div className="bg-white rounded-xl shadow border overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="text-left px-6 py-4">Photo</th>
+                <th className="text-left px-6 py-4">Name</th>
+                <th className="text-left px-6 py-4">Email</th>
+                <th className="text-center px-6 py-4">Action</th>
+              </tr>
+            </thead>
 
-                <p className="text-gray-500">{user.email}</p>
-              </div>
+            <tbody>
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="text-center py-10 text-gray-500">
+                    No user data.
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id} className="border-t hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <img
+                        src={
+                          user.picture
+                            ? `http://localhost:8080/uploads/${user.picture}`
+                            : "https://ui-avatars.com/api/?name=User"
+                        }
+                        alt={user.name}
+                        className="w-12 h-12 rounded-full object-cover border"
+                      />
+                    </td>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleEdit(user)}
-                  className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                >
-                  <FaEdit />
-                  Edit
-                </button>
+                    <td className="px-6 py-4 font-medium">{user.name}</td>
 
-                <button
-                  onClick={() => deleteUser(user.id)}
-                  className="flex items-center gap-2 text-red-600 hover:text-red-800"
-                >
-                  <FaTrash />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                    <td className="px-6 py-4 text-gray-600">{user.email}</td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-5">
+                        <button
+                          onClick={() => handleEdit(user)}
+                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                        >
+                          <FaEdit />
+                          Edit
+                        </button>
+
+                        <button
+                          onClick={() => deleteUser(user.id)}
+                          className="flex items-center gap-2 text-red-600 hover:text-red-800"
+                        >
+                          <FaTrash />
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
