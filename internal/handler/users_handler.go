@@ -121,6 +121,9 @@ func (h *UserHandler) Login(c *gin.Context) {
 //	@Param			limit			query		int		false	"Items per page"	default(5)
 //	@Param			search[name]	query		string	false	"Search by name"
 //	@Param			search[email]	query		string	false	"Search by email"
+//	@Param			sort[id]		query		string	false	"Sort by ID (asc/desc)"
+//	@Param			sort[name]		query		string	false	"Sort by Name (asc/desc)"
+//	@Param			sort[email]		query		string	false	"Sort by Email (asc/desc)"
 //	@Success		200				{object}	lib.Response
 //	@Failure		500				{object}	lib.Response
 //	@Router			/users [get]
@@ -140,8 +143,19 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 
 	searchName := c.Query("search[name]")
 	searchEmail := c.Query("search[email]")
+	sortID := c.Query("sort[id]")
+	sortName := c.Query("sort[name]")
+	sortEmail := c.Query("sort[email]")
 
-	users, err := h.service.GetUser(page, limit, searchName, searchEmail)
+	users, err := h.service.GetUser(
+		page,
+		limit,
+		searchName,
+		searchEmail,
+		sortID,
+		sortName,
+		sortEmail,
+	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, lib.Response{
 			Success: false,
